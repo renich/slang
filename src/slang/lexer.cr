@@ -111,15 +111,53 @@ module Slang
           break if current_attr_name.empty?
           @token.add_attribute current_attr_name, consume_value(open_char, close_char), true
           current_attr_name = ""
-        when ' ', close_char
-          break unless current_attr_name.empty?
-          next_char
+        when ' ', '\t'
+          if open_char != ' '
+            unless current_attr_name.empty?
+              @token.add_attribute current_attr_name, "true", false
+              current_attr_name = ""
+            end
+            next_char
+          else
+            break unless current_attr_name.empty?
+            next_char
+          end
+        when '\r', '\n'
+          if open_char != ' '
+            unless current_attr_name.empty?
+              @token.add_attribute current_attr_name, "true", false
+              current_attr_name = ""
+            end
+            skip_newline
+          else
+            break
+          end
+        when close_char
+          if open_char != ' '
+            unless current_attr_name.empty?
+              @token.add_attribute current_attr_name, "true", false
+              current_attr_name = ""
+            end
+            next_char
+            break
+          else
+            break
+          end
         else
           break
         end
       end
 
       go_back(current_attr_name.size, current_attr_name.bytesize)
+    end
+
+    private def skip_newline
+      if current_char == '\r'
+        raise "slang expected '\\n' after '\\r'" unless next_char == '\n'
+      end
+      @line_number += 1
+      @column_number = 0
+      next_char
     end
 
     private def consume_element_name
@@ -206,7 +244,7 @@ module Slang
       @token.type = :CONTROL
       next_char
       next_char if current_char == ' '
-      @token.value = consume_line(escape_double_quotes=false)
+      @token.value = consume_line(escape_double_quotes = false)
     end
 
     private def consume_output
@@ -228,7 +266,7 @@ module Slang
       end
 
       skip_whitespace
-      @token.value = consume_line(escape_double_quotes=false).strip
+      @token.value = consume_line(escape_double_quotes = false).strip
       @token.value = " #{@token.value}" if prepend_whitespace
       @token.value = "#{@token.value} " if append_whitespace
     end
@@ -349,7 +387,7 @@ module Slang
       @token.value = "\"#{consume_line}\""
     end
 
-    private def consume_line(escape_double_quotes=true)
+    private def consume_line(escape_double_quotes = true)
       String.build do |str|
         loop do
           if current_char == '\n' || current_char == '\0'
