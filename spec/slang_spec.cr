@@ -252,8 +252,8 @@ describe Slang do
       <div>
         <svg width="256" height="448" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
           <defs>
-            <path id=\"shape1\" d=\"M184 144q0 3.25-2.375\"></path>
-            <path id=\"shape2\" d=\"M184 144q0 3.25-2.375\"></path>
+            <path id="shape1" d="M184 144q0 3.25-2.375"></path>
+            <path id="shape2" d="M184 144q0 3.25-2.375"></path>
           </defs>
         </svg>
       </div>
@@ -285,6 +285,15 @@ describe Slang do
         let twoLines = "bar\\nbaz";
         let hello = "Hello, world!";
         let obj = {"a":17,"b":"foo"};
+      </script>
+      HTML
+    end
+    it "renders javascript with backslashes correctly" do
+      res = render("javascript:\n  let foo = \"bar\\nbaz\";\n  let hash = \"\\\#{bar}\";")
+      res.should eq <<-HTML
+      <script>
+        let foo = "bar\\nbaz";
+        let hash = "\\\#{bar}";
       </script>
       HTML
     end
