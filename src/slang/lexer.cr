@@ -291,6 +291,10 @@ module Slang
         loop do
           if escape_double_quotes
             if current_char == '"'
+              if escaped
+                escaped = false
+                str << '\\' unless crystal
+              end
               str << "\\\""
               next_char
               next

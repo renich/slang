@@ -289,11 +289,12 @@ describe Slang do
       HTML
     end
     it "renders javascript with backslashes correctly" do
-      res = render("javascript:\n  let foo = \"bar\\nbaz\";\n  let hash = \"\\\#{bar}\";")
+      res = render("javascript:\n  let foo = \"bar\\nbaz\";\n  let hash = \"\\\#{bar}\";\n  let s = \"a\\\"b\";")
       res.should eq <<-HTML
       <script>
         let foo = "bar\\nbaz";
         let hash = "\\\#{bar}";
+        let s = "a\\\"b";
       </script>
       HTML
     end
