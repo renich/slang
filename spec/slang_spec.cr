@@ -359,6 +359,12 @@ describe Slang do
       <script defer crossorigin="anonymous"></script>
       HTML
     end
+    it "renders inline content after multiline attributes wrapper correctly" do
+      res = render(%{a{\n  href="/"\n} Link})
+      res.should eq <<-HTML
+      <a href="/">Link</a>
+      HTML
+    end
   end
 
   describe "inline tags" do

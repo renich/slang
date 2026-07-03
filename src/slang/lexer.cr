@@ -17,12 +17,13 @@ module Slang
       @token = Token.new
       @token.line_number = @line_number
       @token.column_number = @column_number
+      @token.end_line_number = @line_number
 
       if @raw_text_column > 0 && @column_number < @raw_text_column
         @raw_text_column = 0
       end
 
-      inline = @raw_text_column > 0 || (@last_token.type == :ELEMENT && @last_token.line_number == @line_number)
+      inline = @raw_text_column > 0 || (@last_token.type == :ELEMENT && @last_token.end_line_number == @line_number)
 
       case current_char
       when '\0'
@@ -91,6 +92,7 @@ module Slang
           break
         end
       end
+      @token.end_line_number = @line_number
     end
 
     private def consume_inline_element
